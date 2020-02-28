@@ -4,7 +4,7 @@
 #
 Name     : docker-pycreds
 Version  : 0.4.0
-Release  : 6
+Release  : 7
 URL      : https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz
 Summary  : Python bindings for the docker credentials store API
@@ -15,10 +15,43 @@ Requires: docker-pycreds-python = %{version}-%{release}
 Requires: docker-pycreds-python3 = %{version}-%{release}
 Requires: six
 BuildRequires : buildreq-distutils3
+BuildRequires : six
 
 %description
 # docker-pycreds
+
 [![CircleCI](https://circleci.com/gh/shin-/dockerpy-creds/tree/master.svg?style=svg)](https://circleci.com/gh/shin-/dockerpy-creds/tree/master)
+
+Python bindings for the docker credentials store API
+
+## Credentials store info
+
+[Docker documentation page](https://docs.docker.com/engine/reference/commandline/login/#/credentials-store)
+
+## Requirements
+
+On top of the dependencies in `requirements.txt`, the `docker-credential`
+executable for the platform must be installed on the user's system.
+
+## API usage
+
+```python
+
+import dockerpycreds
+
+store = dockerpycreds.Store('secretservice')
+store.store(
+    server='https://index.docker.io/v1/', username='johndoe',
+    secret='hunter2'
+)
+
+print(store.list())
+
+print(store.get('https://index.docker.io/v1/'))
+
+
+store.erase('https://index.docker.io/v1/')
+```
 
 %package license
 Summary: license components for the docker-pycreds package.
@@ -41,6 +74,7 @@ python components for the docker-pycreds package.
 Summary: python3 components for the docker-pycreds package.
 Group: Default
 Requires: python3-core
+Provides: pypi(docker-pycreds)
 
 %description python3
 python3 components for the docker-pycreds package.
@@ -48,20 +82,31 @@ python3 components for the docker-pycreds package.
 
 %prep
 %setup -q -n docker-pycreds-0.4.0
+cd %{_builddir}/docker-pycreds-0.4.0
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1549922534
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1582920152
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
 
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/docker-pycreds
-cp LICENSE %{buildroot}/usr/share/package-licenses/docker-pycreds/LICENSE
+cp %{_builddir}/docker-pycreds-0.4.0/LICENSE %{buildroot}/usr/share/package-licenses/docker-pycreds/2b8b815229aa8a61e483fb4ba0588b8b6c491890
 python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
@@ -72,7 +117,7 @@ echo ----[ mark ]----
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/docker-pycreds/LICENSE
+/usr/share/package-licenses/docker-pycreds/2b8b815229aa8a61e483fb4ba0588b8b6c491890
 
 %files python
 %defattr(-,root,root,-)
