@@ -4,7 +4,7 @@
 #
 Name     : docker-pycreds
 Version  : 0.4.0
-Release  : 7
+Release  : 8
 URL      : https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz
 Summary  : Python bindings for the docker credentials store API
@@ -19,39 +19,7 @@ BuildRequires : six
 
 %description
 # docker-pycreds
-
 [![CircleCI](https://circleci.com/gh/shin-/dockerpy-creds/tree/master.svg?style=svg)](https://circleci.com/gh/shin-/dockerpy-creds/tree/master)
-
-Python bindings for the docker credentials store API
-
-## Credentials store info
-
-[Docker documentation page](https://docs.docker.com/engine/reference/commandline/login/#/credentials-store)
-
-## Requirements
-
-On top of the dependencies in `requirements.txt`, the `docker-credential`
-executable for the platform must be installed on the user's system.
-
-## API usage
-
-```python
-
-import dockerpycreds
-
-store = dockerpycreds.Store('secretservice')
-store.store(
-    server='https://index.docker.io/v1/', username='johndoe',
-    secret='hunter2'
-)
-
-print(store.list())
-
-print(store.get('https://index.docker.io/v1/'))
-
-
-store.erase('https://index.docker.io/v1/')
-```
 
 %package license
 Summary: license components for the docker-pycreds package.
@@ -74,7 +42,8 @@ python components for the docker-pycreds package.
 Summary: python3 components for the docker-pycreds package.
 Group: Default
 Requires: python3-core
-Provides: pypi(docker-pycreds)
+Provides: pypi(docker_pycreds)
+Requires: pypi(six)
 
 %description python3
 python3 components for the docker-pycreds package.
@@ -89,8 +58,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1582920152
-# -Werror is for werrorists
+export SOURCE_DATE_EPOCH=1583533980
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
